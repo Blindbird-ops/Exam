@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="icon" href="resources/angel_and_captain.png" type="image/x-icon">
+
+  <!-- OL & Plugins CSS -->
+  <link rel="stylesheet" href="resources/ol.css">
+  <link rel="stylesheet" href="resources/fontawesome-all.min.css">
+  <link rel="stylesheet" href="resources/horsey.min.css">
+  <link rel="stylesheet" href="resources/ol3-search-layer.min.css">
+  <link rel="stylesheet" href="resources/ol-layerswitcher.css">
+  <link rel="stylesheet" href="resources/qgis2web.css">
+  <link rel="stylesheet" href="resources/custom.css">
+
+  <title>Poblacion, Taytay, Palawan INTERACTIVE MAP</title>
+
+  <style>
+    /* Container for the external search box */
+    #external-search {
+      width: 100%;
+      padding: 0.5em;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      box-sizing: border-box;
+    }
+    /* Make the OL search input fill its container */
+    #external-search .ol-search {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <header class="map-header">
+      <div class="logo">
+        <img src="resources/angel_and_captain.png" alt="Logo">
+      </div>
+  <div class="title-section" style="text-align: center;"> <p class="main-title-location">Poblacion, Taytay, Palawan</p>
+    <h1 class="main-title-map">INTERACTIVE MAP</h1>
+        <p class="main-subtitle">By: Angel Kate Galia and Captain Faustino</p>
+      </div>
+    </header>
+
+    <!-- External search bar -->
+    <div id="external-search"></div>
+
+    <!-- Map + popup -->
+    <div id="map">
+      <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+      </div>
+    </div>
+
+    <!-- Feature info panel -->
+    <div class="location-info-section">
+      <div class="location-info-header">Location information</div>
+      <div class="location-info-content">
+        <p>Click on a feature on the map to see its information here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QGIS2Web & OL plugins -->
+  <script src="resources/qgis2web_expressions.js"></script>
+  <script src="resources/proj4.js"></script>
+  <script>proj4.defs('EPSG:4326','+proj=longlat +datum=WGS84 +no_defs');</script>
+  <script src="resources/functions.js"></script>
+  <script src="resources/ol.js"></script>
+  <script src="resources/horsey.min.js"></script>
+  <script src="resources/ol3-search-layer.js"></script>
+  <script src="resources/ol-layerswitcher.js"></script>
+
+  <!-- Generated layers & styles -->
+  <script src="layers/poblacion_pois_0.js"></script>
+  <script src="layers/Poblacion_Taytaygadm41_phl_3_1.js"></script>
+  <script src="layers/poblacion_building_2.js"></script>
+  <script src="layers/poblacion_transport_3.js"></script>
+  <script src="layers/poblacion_roads_4.js"></script>
+  <script src="layers/poblacion_water_5.js"></script>
+  <script src="layers/poblacion_waterways_6.js"></script>
+
+  <script src="styles/poblacion_pois_0_style.js"></script>
+  <script src="styles/Poblacion_Taytaygadm41_phl_3_1_style.js"></script>
+  <script src="styles/poblacion_building_2_style.js"></script>
+  <script src="styles/poblacion_transport_3_style.js"></script>
+  <script src="styles/poblacion_roads_4_style.js"></script>
+  <script src="styles/poblacion_water_5_style.js"></script>
+  <script src="styles/poblacion_waterways_6_style.js"></script>
+
+  <script src="layers/layers.js"></script>
+  <script src="resources/Autolinker.min.js"></script>
+  <script src="resources/qgis2web.js"></script>
+
+  <!-- ─── Custom Search + Info Wiring ───────────────────────────────────── -->
+  <!-- ─── Custom Search + Info Wiring ───────────────────────────────────── -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof map === 'undefined') {
+        console.error('Map object not found. Ensure qgis2web.js loaded first.');
+        return;
+    }
+
+    // ── Helper: flatten any layer groups ─────────────────────────────
+    function flatten(layers) {
+        const out = [];
+        layers.forEach(l => {
+            out.push(l);
+            if (typeof l.getLayers === 'function') {
+                out.push(...flatten(l.getLayers().getArray()));
+            }
+        });
+        return out;
+    }
+
+    // ── Search Control Setup (keep existing) ─────────────────────────
+
+    // ── Fixed Feature Info Panel Implementation ──────────────────────
+    const infoContent = document.querySelector('.location-info-content');
+    
+    // 1. Add pointer-events CSS fix
+    const mapDiv = document.getElementById('map');
+    mapDiv.style.pointerEvents = 'auto';
+
+    // 2. Improved click handler
+    map.on('click', function(evt) {
+        try {
+            const features = map.getFeaturesAtPixel(evt.pixel, {
+                layerFilter: layer => layer instanceof ol.layer.Vector,
+                hitTolerance: 10 // Increased from 5 for better accuracy
+            });
+
+            infoContent.innerHTML = ''; // Clear previous content
+
+            if (!features || features.length === 0) {
+                infoContent.innerHTML = '<p>No features found at this location</p>';
+                return;
+            }
+
+            // 3. Process all matching features
+            features.forEach(feature => {
+                const props = feature.getProperties();
+                const geometryType = feature.getGeometry().getType();
+                
+                // 4. Auto-detect label field
+                const label = props.name || props.Name || props.NAME || 'POBLACION Feature';
+                const details = [];
+
+                // 5. Show all properties for debugging
+                Object.entries(props).forEach(([key, value]) => {
+                    if (key !== 'geometry') {
+                        details.push(`
+                            <div class="prop-row">
+                                <span class="prop-key">${key}:</span>
+                                <span class="prop-value">${value || '<em>empty</em>'}</span>
+                            </div>
+                        `);
+                    }
+                });
+
+                infoContent.innerHTML += `
+                    <div class="feature-block">
+                        <h4>${label}</h4>
+                        <small>Type: ${geometryType}</small>
+                        ${details.join('')}
+                    </div>
+                `;
+            });
+
+        } catch (error) {
+            console.error('Feature click error:', error);
+            infoContent.innerHTML = '<p>Error loading feature data</p>';
+        }
+    });
+
+    // 6. Add hover style for better UX
+    const hoverInteraction = new ol.interaction.Select({
+        condition: ol.events.condition.pointerMove,
+        layers: layers => layers.some(l => l instanceof ol.layer.Vector),
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: 'rgba(255,0,0,0.9)',
+                width: 2
+            }),
+            text: new ol.style.Text({
+                text: feature => feature.get('name') || feature.get('Name') || '',
+                font: 'bold 12px Open Sans',
+                fill: new ol.style.Fill({color: '#000'}),
+                stroke: new ol.style.Stroke({color: '#fff', width: 3})
+            })
+        })
+    });
+    map.addInteraction(hoverInteraction);
+});
+</script>
+</body>
+</html>
