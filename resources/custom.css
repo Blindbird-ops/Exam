@@ -1,0 +1,171 @@
+/* resources/custom.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #ffffff; /* White background for the page */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-container {
+    width: 100%;
+    max-width: 1100px; /* Adjust as needed, similar to map width or slightly larger */
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Header Styles */
+.map-header {
+    background-color: #005f73; /* Dark Teal */
+    color: #ffffff;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px; /* Space below header */
+}
+
+.map-header .logo {
+    background-color: #fef001; /* Yellow */
+    border-radius: 50%;
+    width: 80px; /* Adjust size as needed */
+    height: 80px; /* Adjust size as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+    overflow: hidden; /* Ensure image stays within circle */
+}
+
+.map-header .logo img {
+    max-width: 90%; /* Adjust logo image size within the circle */
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.map-header .title-section {
+    flex-grow: 1;
+}
+
+.map-header .main-title-location {
+    font-size: 0.9em;
+    margin: 0;
+    font-weight: normal;
+}
+
+.map-header .main-title-map {
+    font-size: 1.8em;
+    margin: 5px 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.map-header .main-subtitle {
+    font-size: 0.8em;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Search Bar Styles */
+.search-bar-container {
+    display: flex;
+    margin-bottom: 15px; /* Space below search bar */
+    border: 1px solid #b0bec5; /* Light border for the container */
+    border-radius: 4px;
+}
+
+#custom-search-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    background-color: #eef3f5; /* Very light blue/grey */
+    border-radius: 4px 0 0 4px;
+    outline: none;
+}
+
+#custom-search-input::placeholder {
+    color: #546e7a;
+}
+
+#custom-search-button {
+    padding: 10px 15px;
+    font-size: 1em;
+    background-color: #d8e2e7; /* Slightly darker than input bg */
+    border: none;
+    border-left: 1px solid #b0bec5; /* Separator line */
+    color: #37474f;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+}
+
+#custom-search-button:hover {
+    background-color: #c5d3d9;
+}
+
+/* Map Container Styles */
+#map {
+    width: 100%; /* Make map responsive within its container */
+    height: 550px; /* Adjust height as desired, or use aspect ratio */
+    background-color: #005f73; /* Fallback color, image shows map content filling this */
+    border: 2px solid #005f73; /* Border matching the dark teal */
+    box-sizing: border-box;
+    position: relative; /* Important for OpenLayers controls positioning */
+}
+
+/* Ensure OpenLayers controls (like zoom) are visible and styled acceptably */
+/* The image shows zoom controls in the top-left corner of the map. This is usually default. */
+.ol-zoom {
+    top: .5em;
+    left: .5em;
+}
+.ol-control button { /* Basic styling for OL buttons if needed */
+    background-color: rgba(255, 255, 255, 0.8) !important; /* Override existing styles if necessary */
+    color: #005f73 !important;
+    border: 1px solid #005f73 !important;
+}
+.ol-control button:hover {
+    background-color: rgba(220, 220, 220, 0.9) !important;
+}
+
+/* Location Information Section Styles */
+.location-info-section {
+    margin-top: 15px; /* Space above location info */
+    border: 1px solid #b0e0e6; /* Light blue border */
+    border-radius: 4px;
+}
+
+.location-info-header {
+    background-color: #cce7ef; /* Light Blue */
+    color: #005f73; /* Dark Teal text */
+    padding: 10px 15px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 4px 4px 0 0;
+}
+
+.location-info-content {
+    padding: 15px;
+    background-color: #ffffff;
+    font-size: 0.9em;
+    min-height: 50px; /* Give some initial height */
+    border-radius: 0 0 4px 4px;
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+    .map-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .map-header .logo {
+        margin-bottom: 10px;
+    }
+
+    #map {
+        height: 400px; /* Adjust map height for smaller screens */
+    }
+}
+
